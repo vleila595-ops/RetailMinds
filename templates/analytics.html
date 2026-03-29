@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+    <!-- Header -->
+    <div class="text-center mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Product Analytics Dashboard</h1>
+        <p class="text-sm sm:text-base lg:text-lg text-gray-600 px-2">Advanced insights into your product performance, pricing, and sales patterns</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div id="summary-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <!-- Summary will be loaded dynamically -->
+    </div>
+
+    <!-- Modern Analytics Navigation -->
+<div class="bg-gradient-to-br from-white to-gray-50 rounded-lg sm:rounded-2xl shadow-lg p-4 sm:p-6 mb-8 border border-gray-100">
+    <div class="flex items-center justify-between mb-4 sm:mb-6">
+        <h2 class="text-lg sm:text-2xl font-bold text-gray-800">Analytics Modules</h2>
+            <div class="flex space-x-2">  <!--
+            <button class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                <i class="fas fa-search text-gray-600"></i>
+            </button>
+            <button class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                <i class="fas fa-cog text-gray-600"></i>
+            </button>-->
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <button onclick="showSection('price-analysis')" class="analytics-card group bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg sm:rounded-xl p-4 sm:p-5 transition-all duration-300 hover:shadow-md">
+            <div class="flex items-center justify-between mb-2 sm:mb-3">
+                <div class="w-10 sm:w-12 h-10 sm:h-12 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fas fa-tags text-lg sm:text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 text-base sm:text-lg mb-1">Price Analysis</h3>
+            <p class="text-gray-500 text-xs sm:text-sm">Analyze pricing trends and strategies</p>
+        </button>
+        
+        <button onclick="showSection('movement-analysis')" class="analytics-card group bg-white hover:bg-green-50 border border-gray-200 hover:border-green-200 rounded-lg sm:rounded-xl p-4 sm:p-5 transition-all duration-300 hover:shadow-md">
+            <div class="flex items-center justify-between mb-2 sm:mb-3">
+                <div class="w-10 sm:w-12 h-10 sm:h-12 rounded-lg bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fas fa-running text-lg sm:text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-green-500 transition-colors"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 text-base sm:text-lg mb-1">Product Movement</h3>
+            <p class="text-gray-500 text-xs sm:text-sm">Track product performance and velocity</p>
+        </button>
+        
+            <!--
+            <button onclick="showSection('transaction-analysis')" class="analytics-card group bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-200 rounded-xl p-5 transition-all duration-300 hover:shadow-md">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-md">
+                        <i class="fas fa-receipt text-xl"></i>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 group-hover:text-purple-500 transition-colors"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 text-lg mb-1">Transaction Patterns</h3>
+                <p class="text-gray-500 text-sm">Understand customer purchasing behavior</p>
+            </button>
+                ('transaction-analysis')<i class="fas fa-receipt text-2xl mb-2"></i>
+                ('profit-potential') <i class="fas fa-chart-line text-2xl mb-2"></i>
+                ('category-analysis') <i class="fas fa-layer-group text-2xl mb-2"></i>
+                ('product-segments') <i class="fas fa-object-group text-2xl mb-2"></i>
+            -->
+        </div>
+    </div>
+
+    <!-- Analytics Content -->
+    <div id="analytics-content">
+        <!-- Content-->
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-12">
+        <i class="fas fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
+        <p class="text-gray-600">Loading analytics...</p>
+    </div>
+</div>
+
+<!-- Price Analysis Template -->
+<template id="price-analysis-template">
+    <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Price Analysis</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-6">
+            <div class="bg-blue-50 rounded-lg p-3 sm:p-4">
+                <h4 class="font-semibold text-blue-800 mb-2 text-sm sm:text-base">Highest Priced Products</h4>
+                <div id="highest-priced-products" class="space-y-1 sm:space-y-2">
+                    <!-- Content will be populated -->
+                </div>
+            </div>
+            <div class="bg-green-50 rounded-lg p-3 sm:p-4">
+                <h4 class="font-semibold text-green-800 mb-2 text-sm sm:text-base">Lowest Priced Products</h4>
+                <div id="lowest-priced-products" class="space-y-1 sm:space-y-2">
+                    <!-- Content will be populated -->
+                </div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                        <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Category</th>
+                        <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase">Avg Price</th>
+                        <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Min Price</th>
+                        <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Max Price</th>
+                        <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Variability</th>
+                    </tr>
+                </thead>
+                <tbody id="price-analysis-table" class="bg-white divide-y divide-gray-200">
+                    <!-- Content will be populated -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>
+
+<!-- Movement Analysis Template -->
+<template id="movement-analysis-template">
+    <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Product Movement Analysis</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div>
+                <h4 class="font-semibold text-green-600 mb-3 sm:mb-4">Fast-Moving Products</h4>
+                <div id="fast-moving-products" class="space-y-2 sm:space-y-3">
+                    <!-- Content will be populated -->
+                </div>
+            </div>
+            <div>
+                <h4 class="font-semibold text-red-600 mb-3 sm:mb-4">Slow-Moving Products</h4>
+                <div id="slow-moving-products" class="space-y-2 sm:space-y-3">
+                    <!-- Content will be populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Global variables
+let currentSection = 'price-analysis';
+
+// Initialize analytics on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAnalyticsSummary();
+    loadPriceAnalysis();
+});
+
+// Load analytics summary
+async function loadAnalyticsSummary() {
+    try {
+        const response = await fetch('/api/analytics/load');
+        const result = await response.json();
+        
+        if (result.success) {
+            const summaryResponse = await fetch('/api/analytics/summary');
+            const summaryResult = await summaryResponse.json();
+            
+            if (summaryResult.success) {
+                renderSummaryCards(summaryResult.summary);
+                document.getElementById('loading-state').classList.add('hidden');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+    }
+}
+
+function renderSummaryCards(summary) {
+    const cardsContainer = document.getElementById('summary-cards');
+    
+    cardsContainer.innerHTML = `
+        <div class="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <i class="fas fa-boxes text-blue-600 text-xl sm:text-2xl"></i>
+                <div>
+                    <p class="text-lg sm:text-2xl font-bold text-blue-800">${summary.total_products}</p>
+                    <p class="text-xs sm:text-sm text-blue-600">Total Products</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-green-50 border border-green-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <i class="fas fa-tags text-green-600 text-xl sm:text-2xl"></i>
+                <div>
+                    <p class="text-lg sm:text-2xl font-bold text-green-800">${summary.total_categories}</p>
+                    <p class="text-xs sm:text-sm text-green-600">Categories</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-purple-50 border border-purple-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <i class="fas fa-receipt text-purple-600 text-xl sm:text-2xl"></i>
+                <div>
+                    <p class="text-lg sm:text-2xl font-bold text-purple-800">${summary.total_transactions.toLocaleString()}</p>
+                    <p class="text-xs sm:text-sm text-purple-600">Transactions</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-orange-50 border border-orange-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <i class="fas fa-calendar-alt text-orange-600 text-xl sm:text-2xl"></i>
+                <div>
+                    <p class="text-xs sm:text-sm font-bold text-orange-800">${summary.date_range.start} to ${summary.date_range.end}</p>
+                    <p class="text-xs sm:text-sm text-orange-600">Date Range</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Section navigation
+function showSection(sectionName) {
+    currentSection = sectionName;
+    
+    // Update active button
+    document.querySelectorAll('.analytics-btn').forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-offset-2', 'ring-white');
+    });
+    event.target.classList.add('ring-2', 'ring-offset-2', 'ring-white');
+    
+    // Load section content
+    switch(sectionName) {
+        case 'price-analysis':
+            loadPriceAnalysis();
+            break;
+        case 'movement-analysis':
+            loadMovementAnalysis();
+            break;
+        case 'transaction-analysis':
+            loadTransactionAnalysis();
+            break;
+        case 'profit-potential':
+            loadProfitPotential();
+            break;
+        case 'category-analysis':
+            loadCategoryAnalysis();
+            break;
+        case 'product-segments':
+            loadProductSegments();
+            break;
+    }
+}
+
+// Load price analysis
+async function loadPriceAnalysis() {
+    try {
+        const response = await fetch('/api/analytics/price-analysis');
+        const result = await response.json();
+        
+        if (result.success) {
+            renderPriceAnalysis(result.data);
+        }
+    } catch (error) {
+        console.error('Error loading price analysis:', error);
+    }
+}
+
+function renderPriceAnalysis(data) {
+    const template = document.getElementById('price-analysis-template');
+    const content = template.content.cloneNode(true);
+    
+    // Sort data by average price
+    const sortedData = data.sort((a, b) => b.Avg_Price - a.Avg_Price);
+    
+    // Render highest priced products
+    const highestContainer = content.getElementById('highest-priced-products');
+    highestContainer.innerHTML = sortedData.slice(0, 5).map(item => `
+        <div class="flex justify-between items-center p-2 sm:p-3 bg-white rounded text-sm">
+            <span class="text-xs sm:text-sm font-medium">${item.Product_Name}</span>
+            <span class="text-xs sm:text-sm font-bold text-blue-600">₱${item.Avg_Price.toLocaleString()}</span>
+        </div>
+    `).join('');
+    
+    // Render lowest priced products  
+    const lowestContainer = content.getElementById('lowest-priced-products');
+    lowestContainer.innerHTML = sortedData.slice(-5).reverse().map(item => `
+        <div class="flex justify-between items-center p-2 sm:p-3 bg-white rounded text-sm">
+            <span class="text-xs sm:text-sm font-medium">${item.Product_Name}</span>
+            <span class="text-xs sm:text-sm font-bold text-green-600">₱${item.Avg_Price.toLocaleString()}</span>
+        </div>
+    `).join('');
+    
+    // Render full table
+    const tableBody = content.getElementById('price-analysis-table');
+    tableBody.innerHTML = sortedData.map(item => `
+        <tr class="hover:bg-gray-50 text-xs sm:text-sm">
+            <td class="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap font-medium text-gray-900">${item.Product_Name}</td>
+            <td class="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-500 hidden sm:table-cell">${item.Category}</td>
+            <td class="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap font-bold text-blue-600">₱${item.Avg_Price.toLocaleString()}</td>
+            <td class="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-500 hidden lg:table-cell">₱${item.Min_Price.toLocaleString()}</td>
+            <td class="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-500 hidden lg:table-cell">₱${item.Max_Price.toLocaleString()}</td>
+            <td class="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap hidden lg:table-cell">
+                <span class="px-2 py-1 rounded-full text-xs ${item.Price_Variability > 0.1 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                    ${(item.Price_Variability * 100).toFixed(1)}%
+                </span>
+            </td>
+        </tr>
+    `).join('');
+    
+    document.getElementById('analytics-content').innerHTML = '';
+    document.getElementById('analytics-content').appendChild(content);
+}
+
+// Load movement analysis
+async function loadMovementAnalysis() {
+    try {
+        const response = await fetch('/api/analytics/movement-analysis');
+        const result = await response.json();
+        
+        if (result.success) {
+            renderMovementAnalysis(result);
+        }
+    } catch (error) {
+        console.error('Error loading movement analysis:', error);
+    }
+}
+
+function renderMovementAnalysis(data) {
+    const template = document.getElementById('movement-analysis-template');
+    const content = template.content.cloneNode(true);
+    
+    // Render fast-moving products
+    const fastContainer = content.getElementById('fast-moving-products');
+    fastContainer.innerHTML = data.fast_moving.slice(0, 10).map(item => `
+        <div class="bg-green-50 border border-green-200 rounded-lg p-2 sm:p-3">
+            <div class="flex justify-between items-start mb-2 gap-2">
+                <span class="font-semibold text-green-800 text-xs sm:text-sm">${item.Product_Name}</span>
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded whitespace-nowrap">${item.Category}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                <div>
+                    <span class="text-gray-600">Daily Qty:</span>
+                    <span class="font-bold text-green-700">${item.Avg_Daily_Quantity.toFixed(1)}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Price:</span>
+                    <span class="font-bold">₱${item.Average_Price_PHP.toLocaleString()}</span>
+                </div>
+            </div>
+            <div class="text-xs text-green-600 mt-1">${item.Price_Position}</div>
+        </div>
+    `).join('');
+    
+    // Render slow-moving products
+    const slowContainer = content.getElementById('slow-moving-products');
+    slowContainer.innerHTML = data.slow_moving.slice(0, 10).map(item => `
+        <div class="bg-red-50 border border-red-200 rounded-lg p-2 sm:p-3">
+            <div class="flex justify-between items-start mb-2 gap-2">
+                <span class="font-semibold text-red-800 text-xs sm:text-sm">${item.Product_Name}</span>
+                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded whitespace-nowrap">${item.Category}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                <div>
+                    <span class="text-gray-600">Daily Qty:</span>
+                    <span class="font-bold text-red-700">${item.Avg_Daily_Quantity.toFixed(1)}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Price:</span>
+                    <span class="font-bold">₱${item.Average_Price_PHP.toLocaleString()}</span>
+                </div>
+            </div>
+            <div class="text-xs text-red-600 mt-1">${item.Price_Position}</div>
+        </div>
+    `).join('');
+    
+    document.getElementById('analytics-content').innerHTML = '';
+    document.getElementById('analytics-content').appendChild(content);
+}
+
+async function loadTransactionAnalysis() {
+    // Implementation for transaction analysis
+}
+
+async function loadProfitPotential() {
+    // Implementation for profit potential
+}
+
+async function loadCategoryAnalysis() {
+    // Implementation for category analysis
+}
+
+async function loadProductSegments() {
+    // Implementation for product segments
+}
+</script>
+
+<style>
+.analytics-btn {
+    @apply text-white p-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex flex-col items-center justify-center;
+}
+
+.analytics-btn span {
+    @apply font-semibold text-lg;
+}
+</style>
+{% endblock %}

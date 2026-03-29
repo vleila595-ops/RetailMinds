@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Add custom CSS for simple animations -->
+<style>
+    .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease-out;
+    }
+    
+    .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .slide-in-left {
+        opacity: 0;
+        transform: translateX(-50px);
+        transition: all 0.6s ease-out;
+    }
+    
+    .slide-in-left.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .slide-in-right {
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.6s ease-out;
+    }
+    
+    .slide-in-right.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .zoom-in {
+        opacity: 0;
+        transform: scale(0.9);
+        transition: all 0.6s ease-out;
+    }
+    
+    .zoom-in.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .pulse-hover:hover {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .bounce-in {
+        animation: bounce 0.6s ease-out;
+    }
+    
+    @keyframes bounce {
+        0% { transform: scale(0.3); opacity: 0; }
+        50% { transform: scale(1.05); }
+        70% { transform: scale(0.9); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<!-- Hero Section with Background Image -->
+<div class="hero-bg bg-cover bg-center bg-no-repeat relative">
+	<!-- Gradient Overlay -->
+	<div class="absolute inset-0 bg-gradient-to-br from-emerald-500/90 via-emerald-600/70 to-emerald-800/60"></div>
+	
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 relative z-10">
+		<div class="text-center">
+			<h1 class="mt-6 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white fade-in" data-delay="100">Predict Sales with Confidence</h1>
+			<p class="mt-4 sm:mt-6 text-lg sm:text-xl lg:text-2xl max-w-3xl mx-auto text-emerald-50/90 fade-in" data-delay="250">
+				Accurate forecasts powered by ARIMA, Prophet, and XGBoost.
+			</p>
+			<div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 fade-in" data-delay="400">
+				<a href="/predict" class="group w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white px-5 sm:px-6 py-3 sm:py-3.5 text-emerald-700 font-semibold shadow-lg shadow-emerald-900/10 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+					<i class="fas fa-rocket mr-2 text-emerald-600 transition-transform group-hover:-rotate-6"></i>
+					Start Predicting
+				</a>
+				<a href="#features" class="group w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white/10 px-5 sm:px-6 py-3 sm:py-3.5 text-white font-semibold border border-white/20 hover:bg-white/15 transition-all">
+					<i class="fas fa-eye mr-2"></i>
+					See Features
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+    <!-- Stats Section -->
+	<div id="stats-section" class="grid grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12 lg:mb-16">
+        <!-- Stats will be loaded via JavaScript -->
+    </div>
+
+    <!-- Features Section -->
+	<div id="features" class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12 lg:mb-16">
+		<div class="text-center p-6 lg:p-8 bg-white rounded-2xl shadow-lg ring-1 ring-emerald-100/70 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 slide-in-left">
+			<div class="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5">
+				<i class="fas fa-chart-line text-emerald-600 text-2xl"></i>
+			</div>
+			<h3 class="text-xl font-semibold mb-2">Multiple Models</h3>
+			<p class="text-gray-600">ARIMA, Prophet, and XGBoost working together for optimal accuracy.</p>
+		</div>
+		
+		<div class="text-center p-6 lg:p-8 bg-white rounded-2xl shadow-lg ring-1 ring-emerald-100/70 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in">
+			<div class="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5">
+				<i class="fas fa-bolt text-emerald-600 text-2xl"></i>
+			</div>
+			<h3 class="text-xl font-semibold mb-2">Real-time Analysis</h3>
+			<p class="text-gray-600">Automatic model selection based on your product's sales patterns.</p>
+		</div>
+		
+		<div class="text-center p-6 lg:p-8 bg-white rounded-2xl shadow-lg ring-1 ring-emerald-100/70 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 slide-in-right">
+			<div class="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5">
+				<i class="fas fa-chart-bar text-emerald-600 text-2xl"></i>
+			</div>
+			<h3 class="text-xl font-semibold mb-2">Beautiful Visualizations</h3>
+			<p class="text-gray-600">Interactive charts and graphs to understand your sales trends.</p>
+		</div>
+	</div>
+
+    <!-- CTA Section -->
+	<div class="text-center bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-3xl p-8 sm:p-12 text-white zoom-in">
+		<h2 class="text-2xl sm:text-3xl font-bold mb-3">Ready to Predict Your Sales?</h2>
+		<p class="text-lg sm:text-xl mb-6 opacity-95">Get started with our intelligent forecasting system today.</p>
+		<a href="/predict" class="group bg-white text-emerald-700 px-6 sm:px-8 py-3 rounded-xl font-semibold hover:bg-emerald-50 transition-all inline-flex items-center shadow-md hover:shadow-lg hover:-translate-y-0.5">
+			<i class="fas fa-magic mr-2 text-emerald-600 transition-transform group-hover:rotate-6"></i>
+			Try Prediction Tool
+		</a>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple animation function
+function initAnimations() {
+    // Hero animations (sequential)
+    const heroElements = document.querySelectorAll('.hero-bg .fade-in');
+    heroElements.forEach((element, index) => {
+        const delay = parseInt(element.getAttribute('data-delay') || 0);
+        setTimeout(() => {
+            element.classList.add('visible');
+        }, delay);
+    });
+
+    // Scroll animations
+    const animatedElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .zoom-in');
+    
+    function checkScroll() {
+        animatedElements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const elementVisible = 150;
+            
+            if (elementTop < window.innerHeight - elementVisible) {
+                // Add delay for staggered effect
+                const delay = parseInt(element.getAttribute('data-delay') || 0);
+                setTimeout(() => {
+                    element.classList.add('visible');
+                }, delay);
+            }
+        });
+    }
+
+    // Initial check
+    checkScroll();
+    
+    // Check on scroll
+    window.addEventListener('scroll', checkScroll);
+}
+
+// Load stats with animations
+function loadStats() {
+    fetch('/analyze_data')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.error) {
+                const statsSection = document.getElementById('stats-section');
+                statsSection.innerHTML = `
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg ring-1 ring-emerald-100/70 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in">
+                        <i class="fas fa-boxes text-2xl sm:text-3xl text-emerald-600 mb-2 sm:mb-3 bounce-in"></i>
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800">${data.total_products}</h3>
+                        <p class="text-gray-600 text-sm sm:text-base">Products</p>
+                    </div>
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg ring-1 ring-emerald-100/70 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in" style="transition-delay: 100ms">
+                        <i class="fas fa-tags text-2xl sm:text-3xl text-emerald-600 mb-2 sm:mb-3 bounce-in" style="animation-delay: 100ms"></i>
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800">${data.total_categories}</h3>
+                        <p class="text-gray-600 text-sm sm:text-base">Categories</p>
+                    </div>
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg ring-1 ring-emerald-100/70 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in" style="transition-delay: 200ms">
+                        <i class="fas fa-money-bill-wave text-2xl sm:text-3xl text-emerald-600 mb-2 sm:mb-3 bounce-in" style="animation-delay: 200ms"></i>
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800">${data.total_sales}</h3>
+                        <p class="text-gray-600 text-sm sm:text-base">Total Sales</p>
+                    </div>
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg ring-1 ring-emerald-100/70 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in" style="transition-delay: 300ms">
+                        <i class="fas fa-calendar-alt text-2xl sm:text-3xl text-orange-500 mb-2 sm:mb-3 bounce-in" style="animation-delay: 300ms"></i>
+                        <h3 class="text-base sm:text-lg font-bold text-gray-800">${data.date_range}</h3>
+                        <p class="text-gray-600 text-sm sm:text-base">Date Range</p>
+                    </div>
+                `;
+                
+                // Trigger animations for stats
+                setTimeout(() => {
+                    const statElements = statsSection.querySelectorAll('.fade-in');
+                    statElements.forEach((element, index) => {
+                        setTimeout(() => {
+                            element.classList.add('visible');
+                        }, index * 100);
+                    });
+                }, 100);
+            }
+        })
+        .catch(error => console.error('Error loading stats:', error));
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initAnimations();
+    loadStats();
+});
+
+// Re-check animations when window resizes
+window.addEventListener('resize', function() {
+    const animatedElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .zoom-in');
+    animatedElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        if (elementTop < window.innerHeight - 100) {
+            element.classList.add('visible');
+        }
+    });
+});
+</script>
+{% endblock %}

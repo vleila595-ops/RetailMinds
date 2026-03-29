@@ -1,0 +1,77 @@
+<nav class="bg-emerald-700 shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+            <a href="/" class="text-white text-lg font-bold hover:text-emerald-100 transition">
+                RetailMinds
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-white hover:text-emerald-100 transition">Home</a>
+                <a href="/predict" class="text-white hover:text-emerald-100 transition">Predict</a>
+                <a href="/data" class="text-white hover:text-emerald-100 transition">Data</a>
+                <a href="/product" class="text-white hover:text-emerald-100 transition">Products</a>
+                <a href="/analytics" class="text-white hover:text-emerald-100 transition">Analytics</a>
+            </div>
+            
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white hover:text-emerald-100 focus:outline-none p-2" aria-label="Toggle menu" aria-expanded="false">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>  
+    
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="md:hidden hidden bg-emerald-600 border-t border-emerald-500">
+        <div class="px-4 py-3 space-y-2">
+            <a href="/" class="block text-white hover:bg-emerald-700 hover:text-emerald-100 py-2 px-3 rounded transition">Home</a>
+            <a href="/predict" class="block text-white hover:bg-emerald-700 hover:text-emerald-100 py-2 px-3 rounded transition">Predict</a>
+            <a href="/data" class="block text-white hover:bg-emerald-700 hover:text-emerald-100 py-2 px-3 rounded transition">Data</a>
+            <a href="/product" class="block text-white hover:bg-emerald-700 hover:text-emerald-100 py-2 px-3 rounded transition">Products</a>
+            <a href="/analytics" class="block text-white hover:bg-emerald-700 hover:text-emerald-100 py-2 px-3 rounded transition">Analytics</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (!mobileMenuButton || !mobileMenu) return;
+        
+        mobileMenuButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isHidden = mobileMenu.classList.contains('hidden');
+            
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'true');
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // Close mobile menu when a link is clicked
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            });
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('nav')) {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+</script>
+               

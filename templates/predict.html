@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+    <div class="text-center mb-8 sm:mb-12">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">Sales Prediction</h1>
+        <p class="text-base sm:text-lg text-gray-600 px-2">Select a product and forecast period to generate predictions</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <!-- Input Form -->
+        <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg sm:shadow-xl p-6 sm:p-8">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-6 text-gray-800">Prediction Parameters</h2>
+            
+            <form id="prediction-form">
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2 font-medium">Select Product</label>
+                    <select id="product-select" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <option value="">Loading products...</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2 font-medium">Forecast Period (Days)</label>
+                    <input type="number" id="forecast-days" value="30" min="7" max="90" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                    <i class="fas fa-chart-line mr-2"></i> Generate Prediction
+                </button>
+            </form>
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="hidden mt-6 p-4 bg-blue-50 rounded-lg">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-spinner fa-spin text-blue-600 text-xl mr-3"></i>
+                    <span class="text-blue-800">Analyzing data and generating predictions...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Preview -->
+        <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg sm:shadow-xl p-6 sm:p-8">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-6 text-gray-800">Prediction Results</h2>
+            
+            <div id="results-placeholder" class="text-center py-12">
+                <i class="fas fa-chart-bar text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Your prediction results will appear here</p>
+            </div>
+            
+            <div id="results-content" class="hidden">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load available products
+fetch('/api/products')
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('product-select');
+        if (data.products) {
+            select.innerHTML = '<option value="">Select a product...</option>';
+            data.products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                select.appendChild(option);
+            });
+        } else {
+            select.innerHTML = '<option value="">Error loading products</option>';
+        }
+    });
+
+// Handle form submission
+document.getElementById('prediction-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const form = e.target;
+    const button = form.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    
+    const productName = document.getElementById('product-select').value;
+    const forecastDays = document.getElementById('forecast-days').value;
+    
+    if (!productName) {
+        alert('Please select a product');
+        return;
+    }
+    
+    // Show loading
+    showLoading(button);
+    document.getElementById('loading-state').classList.remove('hidden');
+    document.getElementById('results-placeholder').classList.add('hidden');
+    document.getElementById('results-content').classList.add('hidden');
+    
+    try {
+        const response = await fetch('/api/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_name: productName,
+                forecast_days: parseInt(forecastDays)
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayResults(result);
+        } else {
+            throw new Error(result.error || 'Prediction failed');
+        }
+        
+    } catch (error) {
+        alert('Error: ' + error.message);
+    } finally {
+        hideLoading(button, originalText);
+        document.getElementById('loading-state').classList.add('hidden');
+    }
+});
+
+function displayResults(data) {
+    // Store data for potential redirect
+    sessionStorage.setItem('forecastResults', JSON.stringify(data));
+    
+    // Show results on current page
+    const resultsDiv = document.getElementById('results-content');
+    resultsDiv.innerHTML = `
+        <div class="space-y-6">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-600 text-xl mr-3"></i>
+                    <h3 class="text-lg font-semibold text-green-800">Prediction Complete!</h3>
+                </div>
+                <p class="text-green-700 mt-2">Best model: <strong>${data.best_model}</strong></p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-blue-600">Product</p>
+                    <p class="font-semibold">${data.product_name}</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <p class="text-sm text-purple-600">Forecast Days</p>
+                    <p class="font-semibold">${data.forecast_days}</p>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold mb-3">Model Performance (RMSE)</h4>
+                <div class="space-y-2">
+                    ${Object.entries(data.model_performance || {}).map(([model, perf]) => `
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm ${model === data.best_model ? 'font-semibold text-green-600' : 'text-gray-600'}">
+                                ${model} ${model === data.best_model ? '🏆' : ''}
+                            </span>
+                            <span class="text-sm font-mono ${model === data.best_model ? 'text-green-600' : 'text-gray-600'}">
+                                PHP ${perf.rmse ? perf.rmse.toFixed(2) : 'N/A'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="viewDetailedResults()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-chart-bar mr-2"></i>View Detailed Report
+                </button>
+                <button onclick="makeAnotherPrediction()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition">
+                    <i class="fas fa-redo mr-2"></i>Make Another
+                </button>
+            </div>
+        </div>
+    `;
+    
+    resultsDiv.classList.remove('hidden');
+    
+    // Remove the chart creation since we're not showing it here
+}
+
+function viewDetailedResults() {
+    // Redirect to the detailed results page
+    window.location.href = '/result';
+}
+
+function showLoading(button) {
+    document.getElementById('loading-state').classList.remove('hidden');
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+}
+
+function hideLoading(button, originalText) {
+    document.getElementById('loading-state').classList.add('hidden');
+    button.disabled = false;
+    button.innerHTML = originalText;
+}
+
+function makeAnotherPrediction() {
+    // Reset the form
+    document.getElementById('product-select').value = '';
+    document.getElementById('forecast-days').value = '30';
+    document.getElementById('results-content').classList.add('hidden');
+    document.getElementById('results-placeholder').classList.remove('hidden');
+}
+
+function createPredictionChart(predictions, days) {
+    const ctx = document.getElementById('prediction-chart').getContext('2d');
+    
+    // Generate dates for x-axis
+    const dates = [];
+    const today = new Date();
+    for (let i = 1; i <= days; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        dates.push(date.toLocaleDateString());
+    }
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Predicted Sales',
+                data: predictions,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Sales Forecast'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Sales (PHP)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

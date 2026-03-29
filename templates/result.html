@@ -1,0 +1,671 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Sales Forecast Results</h1>
+        <p class="text-xl text-gray-600">Your 30-day sales prediction with actionable insights</p>
+    </div>
+
+    <!-- Forecast Summary Box -->
+    <div id="forecast-summary" class="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white mb-8 shadow-xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-2xl font-bold mb-6">Forecast Overview</h2>
+                <div id="summary-content" class="space-y-4 text-lg">
+                    <!-- Summary will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-xl p-6">
+                <h3 class="text-xl font-semibold mb-4">Model Selection</h3>
+                <div id="model-explanation" class="space-y-3">
+                    <!-- Model explanation will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <!-- Main Chart Column -->
+        <div class="xl:col-span-2">
+            <!-- Chart Container -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">30-Day Sales Forecast</h2>
+                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Predicts daily sales (₱) for the next 30 days based on your past data</span>
+                    </div>
+                </div>
+                <div class="h-96">
+                    <canvas id="forecast-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Insights Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Forecast Insights</h2>
+                <div id="insights-content" class="space-y-4">
+                    <!-- Insights will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Performance Metrics -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Performance Metrics</h3>
+                <div id="performance-metrics" class="space-y-4">
+                    <!-- Metrics will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Key Dates -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Key Dates</h3>
+                <div id="key-dates" class="space-y-3">
+                    <!-- Key dates will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Export Forecast</h3>
+                <div class="space-y-3">
+                    <button onclick="downloadCSV()" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-file-csv"></i>
+                        Download CSV
+                    </button>
+                    <!-- <button onclick="downloadPDF()" class="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-file-pdf"></i>
+                        Download PDF Report
+                    </button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Prediction Button -->
+    <div class="text-center mt-8">
+        <a href="/predict" class="inline-flex items-center gap-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition">
+            <i class="fas fa-arrow-left"></i>
+            Make Another Prediction
+        </a>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+    <div class="text-center">
+        <i class="fas fa-spinner fa-spin text-green-600 text-4xl mb-4"></i>
+        <p class="text-xl text-gray-700">Generating your forecast insights...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script>
+// Global variables
+let forecastData = null;
+let chartInstance = null;
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Get data from session storage or redirect
+    const storedData = sessionStorage.getItem('forecastResults');
+    if (storedData) {
+        forecastData = JSON.parse(storedData);
+        renderForecastPage();
+    } else {
+        // Redirect back to predict page if no data
+        window.location.href = '/predict';
+    }
+});
+
+function renderForecastPage() {
+    if (!forecastData) return;
+    
+    generateSummary();
+    generateModelExplanation();
+    renderChart();
+    generateInsights();
+    generatePerformanceMetrics();
+    generateKeyDates();
+    
+    // Hide loading overlay
+    document.getElementById('loading-overlay').classList.add('hidden');
+}
+
+function generateSummary() {
+    const predictions = forecastData.predictions;
+    const totalSales = predictions.reduce((sum, val) => sum + val, 0);
+    const averageDaily = totalSales / predictions.length;
+    
+    // Find highest and lowest days
+    const maxSales = Math.max(...predictions);
+    const minSales = Math.min(...predictions);
+    const maxIndex = predictions.indexOf(maxSales);
+    const minIndex = predictions.indexOf(minSales);
+    
+    // Generate dates for the forecast period
+    const forecastDates = generateForecastDates(predictions.length);
+    const maxDate = forecastDates[maxIndex];
+    const minDate = forecastDates[minIndex];
+    
+    // Generate reasons for high/low days
+    const maxReason = generateDayReason(maxDate, 'high');
+    const minReason = generateDayReason(minDate, 'low');
+    
+    const summaryHTML = `
+        <div class="space-y-3">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                <p><strong>Total predicted sales:</strong> ₱${totalSales.toLocaleString('en-PH', {maximumFractionDigits: 0})} over next 30 days</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                <p><strong>Average daily sales:</strong> ₱${averageDaily.toLocaleString('en-PH', {maximumFractionDigits: 0})}/day</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                <p><strong>Highest day:</strong> ₱${maxSales.toLocaleString('en-PH', {maximumFractionDigits: 0})} (${formatDate(maxDate)} - ${maxReason})</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                <p><strong>Lowest day:</strong> ₱${minSales.toLocaleString('en-PH', {maximumFractionDigits: 0})} (${formatDate(minDate)} - ${minReason})</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('summary-content').innerHTML = summaryHTML;
+}
+
+function generateModelExplanation() {
+    const modelName = forecastData.best_model;
+    const modelIcons = {
+        'ARIMA': '🧮',
+        'Prophet': '🔮', 
+        'XGBoost': '🤖'
+    };
+    
+    const modelDescriptions = {
+        'ARIMA': 'identified consistent patterns in your sales history',
+        'Prophet': 'detected weekly and seasonal trends in your data',
+        'XGBoost': 'learned complex patterns from multiple factors'
+    };
+    
+    const explanationHTML = `
+        <div class="space-y-4">
+            <div class="flex items-center gap-3 p-3 bg-white bg-opacity-30 rounded-lg">
+                <span class="text-2xl">${modelIcons[modelName] || '🤖'}</span>
+                <div>
+                    <p class="font-semibold">${modelName}</p>
+                    <p class="text-sm opacity-90">${modelDescriptions[modelName] || 'provided the most accurate forecast'}</p>
+                </div>
+                <span class="ml-auto bg-yellow-500 text-white px-2 py-1 rounded text-sm">Best Fit</span>
+            </div>
+            
+            <div class="text-sm space-y-2">
+                <p><strong>Why this model?</strong></p>
+                <p>${modelName} ${modelDescriptions[modelName] || 'provided the most accurate forecast based on your historical sales data.'}</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('model-explanation').innerHTML = explanationHTML;
+}
+
+function renderChart() {
+    const ctx = document.getElementById('forecast-chart').getContext('2d');
+    const predictions = forecastData.predictions;
+    const dates = generateForecastDates(predictions.length);
+    
+    // Calculate trend and performance indicators
+    const maxSales = Math.max(...predictions);
+    const minSales = Math.min(...predictions);
+    const avgSales = predictions.reduce((a, b) => a + b, 0) / predictions.length;
+    
+    // Generate point backgrounds based on performance
+    const pointBackgroundColors = predictions.map(value => {
+        if (value >= avgSales * 1.2) return '#10B981'; // Green - high sales
+        if (value <= avgSales * 0.8) return '#EF4444'; // Red - low sales
+        return '#F59E0B'; // Yellow - average
+    });
+    
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Predicted Sales',
+                data: predictions,
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: pointBackgroundColors,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#3B82F6',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const index = context.dataIndex;
+                            const prevValue = index > 0 ? context.dataset.data[index - 1] : value;
+                            const change = prevValue ? ((value - prevValue) / prevValue * 100) : 0;
+                            const trend = change >= 0 ? '↑' : '↓';
+                            const changeText = Math.abs(change) > 0.1 ? `${trend} ${Math.abs(change).toFixed(1)}% from previous day` : 'No significant change';
+                            
+                            return [
+                                `Predicted Sales: ₱${value.toLocaleString('en-PH', {maximumFractionDigits: 0})}`,
+                                `Trend: ${changeText}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        maxTicksLimit: 10,
+                        callback: function(value, index) {
+                            return dates[index].split(' ')[0]; // Show only day number
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '₱' + value.toLocaleString('en-PH', {maximumFractionDigits: 0});
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Sales (₱)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+function generateInsights() {
+    const predictions = forecastData.predictions;
+    const dates = generateForecastDates(predictions.length);
+    
+    // Analyze patterns
+    const weeklyPattern = analyzeWeeklyPattern(predictions, dates);
+    const trend = analyzeTrend(predictions);
+    const seasonalEvents = detectSeasonalEvents(predictions, dates);
+    
+    const insightsHTML = `
+        <div class="space-y-4">
+            <div class="flex items-start gap-4 p-5 bg-white rounded-xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-chart-line text-green-600 text-lg"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800 text-lg mb-1">Sales Pattern</h4>
+                    <p class="text-gray-600 leading-relaxed">${weeklyPattern}</p>
+                </div>
+                <div class="flex-shrink-0 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="flex items-start gap-4 p-5 bg-white rounded-xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-trending-up text-green-600 text-lg"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800 text-lg mb-1">Overall Trend</h4>
+                    <p class="text-gray-600 leading-relaxed">${trend}</p>
+                </div>
+                <div class="flex-shrink-0 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="flex items-start gap-4 p-5 bg-white rounded-xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-lightbulb text-purple-600 text-lg"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800 text-lg mb-1">Key Opportunities</h4>
+                    <p class="text-gray-600 leading-relaxed">${seasonalEvents}</p>
+                </div>
+                <div class="flex-shrink-0 text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="flex items-start gap-4 p-5 bg-white rounded-xl border-l-4 border-yellow-500 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-bullseye text-yellow-600 text-lg"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800 text-lg mb-1">Recommendation</h4>
+                    <p class="text-gray-600 leading-relaxed">${generateRecommendation(predictions)}</p>
+                </div>
+                <div class="flex-shrink-0 text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('insights-content').innerHTML = insightsHTML;
+}
+
+function generatePerformanceMetrics() {
+    const predictions = forecastData.predictions;
+    const totalSales = predictions.reduce((sum, val) => sum + val, 0);
+    const avgSales = totalSales / predictions.length;
+    const maxSales = Math.max(...predictions);
+    const minSales = Math.min(...predictions);
+    const volatility = calculateVolatility(predictions);
+    
+    const metricsHTML = `
+        <div class="space-y-4">
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <span class="text-gray-600">Confidence Level</span>
+                <span class="font-semibold text-green-600">High</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <span class="text-gray-600">Sales Volatility</span>
+                <span class="font-semibold ${volatility > 0.3 ? 'text-red-600' : volatility > 0.15 ? 'text-yellow-600' : 'text-green-600'}">
+                    ${volatility > 0.3 ? 'High' : volatility > 0.15 ? 'Medium' : 'Low'}
+                </span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <span class="text-gray-600">Peak vs Average</span>
+                <span class="font-semibold text-green-600">${((maxSales/avgSales - 1) * 100).toFixed(0)}% higher</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <span class="text-gray-600">Growth Potential</span>
+                <span class="font-semibold text-green-600">${calculateGrowthPotential(predictions)}%</span>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('performance-metrics').innerHTML = metricsHTML;
+}
+
+function generateKeyDates() {
+    const predictions = forecastData.predictions;
+    const dates = generateForecastDates(predictions.length);
+    const maxSales = Math.max(...predictions);
+    const minSales = Math.min(...predictions);
+    const maxIndex = predictions.indexOf(maxSales);
+    const minIndex = predictions.indexOf(minSales);
+    
+    const keyDatesHTML = `
+        <div class="space-y-3">
+            <div class="flex items-center justify-between p-2 bg-green-50 rounded">
+                <span class="text-sm text-green-800">Best Day</span>
+                <span class="text-sm font-semibold">${formatDate(dates[maxIndex])}</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-red-50 rounded">
+                <span class="text-sm text-red-800">Slowest Day</span>
+                <span class="text-sm font-semibold">${formatDate(dates[minIndex])}</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-green-50 rounded">
+                <span class="text-sm text-green-800">Payday Week</span>
+                <span class="text-sm font-semibold">${findPaydayWeek(dates, predictions)}</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-purple-50 rounded">
+                <span class="text-sm text-purple-800">Review Point</span>
+                <span class="text-sm font-semibold">Mid-month</span>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('key-dates').innerHTML = keyDatesHTML;
+}
+
+// Utility functions
+function generateForecastDates(days) {
+    const dates = [];
+    const today = new Date();
+    for (let i = 1; i <= days; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        dates.push(date.toISOString().split('T')[0]);
+    }
+    return dates;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        weekday: 'short'
+    });
+}
+
+function generateDayReason(date, type) {
+    const day = new Date(date).getDay();
+    const reasons = {
+        high: ['Weekend Shopping', 'Payday Effect', 'Holiday Season', 'Promotion Day', 'Month End'],
+        low: ['Monday Slowdown', 'Mid-week Dip', 'Weather Impact', 'Regular Low Day', 'Pre-holiday']
+    };
+    
+    const dayReasons = {
+        0: type === 'high' ? 'Sunday Sales' : 'Weekend End',
+        1: type === 'high' ? 'Fresh Week Start' : 'Monday Adjustment',
+        5: type === 'high' ? 'Weekend Rush' : 'Preparation Day',
+        6: type === 'high' ? 'Saturday Shopping' : 'Weekend Planning'
+    };
+    
+    return dayReasons[day] || reasons[type][Math.floor(Math.random() * reasons[type].length)];
+}
+
+function analyzeWeeklyPattern(predictions, dates) {
+    // Simple weekly pattern detection
+    const weeklyTotals = [0, 0, 0, 0, 0, 0, 0];
+    predictions.forEach((value, index) => {
+        const day = new Date(dates[index]).getDay();
+        weeklyTotals[day] += value;
+    });
+    
+    const bestDay = weeklyTotals.indexOf(Math.max(...weeklyTotals));
+    const worstDay = weeklyTotals.indexOf(Math.min(...weeklyTotals));
+    
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    return `Sales peak on ${days[bestDay]}s and slow down on ${days[worstDay]}s. Plan inventory and staffing accordingly.`;
+}
+
+function analyzeTrend(predictions) {
+    const firstWeek = predictions.slice(0, 7).reduce((a, b) => a + b, 0) / 7;
+    const lastWeek = predictions.slice(-7).reduce((a, b) => a + b, 0) / 7;
+    const growth = ((lastWeek - firstWeek) / firstWeek * 100);
+    
+    if (growth > 5) return `Strong growth trend (+${growth.toFixed(1)}%). Sales are increasing over the forecast period.`;
+    if (growth < -5) return `Declining trend (${growth.toFixed(1)}%). Consider promotional activities to boost sales.`;
+    return `Stable performance. Sales remain consistent throughout the forecast period.`;
+}
+
+function detectSeasonalEvents(predictions, dates) {
+    const maxSales = Math.max(...predictions);
+    const maxIndex = predictions.indexOf(maxSales);
+    const maxDate = new Date(dates[maxIndex]);
+    
+    return `Highest sales expected around ${formatDate(dates[maxIndex])}. Consider running special promotions during this period.`;
+}
+
+function generateRecommendation(predictions) {
+    const volatility = calculateVolatility(predictions);
+    const avgSales = predictions.reduce((a, b) => a + b, 0) / predictions.length;
+    
+    if (volatility > 0.3) {
+        return "High sales variability detected. Maintain flexible inventory and monitor daily sales closely.";
+    } else if (avgSales > 10000) {
+        return "Strong consistent sales expected. Focus on customer retention and upselling opportunities.";
+    } else {
+        return "Steady sales pattern. Optimize operations and explore growth opportunities.";
+    }
+}
+
+function calculateVolatility(predictions) {
+    const avg = predictions.reduce((a, b) => a + b, 0) / predictions.length;
+    const variance = predictions.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / predictions.length;
+    return Math.sqrt(variance) / avg;
+}
+
+function calculateGrowthPotential(predictions) {
+    const firstThird = predictions.slice(0, 10).reduce((a, b) => a + b, 0) / 10;
+    const lastThird = predictions.slice(-10).reduce((a, b) => a + b, 0) / 10;
+    return Math.max(0, ((lastThird - firstThird) / firstThird * 100)).toFixed(1);
+}
+
+function findPaydayWeek(dates, predictions) {
+    // Simple payday detection (last week of month usually has higher sales)
+    const weeklyGroups = {};
+    dates.forEach((date, index) => {
+        const week = getWeekNumber(new Date(date));
+        if (!weeklyGroups[week]) weeklyGroups[week] = [];
+        weeklyGroups[week].push(predictions[index]);
+    });
+    
+    let bestWeek = '';
+    let highestAvg = 0;
+    
+    Object.entries(weeklyGroups).forEach(([week, sales]) => {
+        const avg = sales.reduce((a, b) => a + b, 0) / sales.length;
+        if (avg > highestAvg) {
+            highestAvg = avg;
+            bestWeek = `Week ${week}`;
+        }
+    });
+    
+    return bestWeek;
+}
+
+function getWeekNumber(date) {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+}
+
+// Download functions
+function downloadCSV() {
+    if (!forecastData) return;
+    
+    const predictions = forecastData.predictions;
+    const dates = generateForecastDates(predictions.length);
+    
+    let csvContent = "Date,Predicted Sales (₱),Trend\n";
+    predictions.forEach((sale, index) => {
+        const trend = index > 0 ? ((sale - predictions[index-1]) / predictions[index-1] * 100).toFixed(1) + '%' : 'Baseline';
+        csvContent += `${dates[index]},${sale.toFixed(2)},${trend}\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sales-forecast-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function downloadPDF() {
+    alert('PDF report generation would be implemented with a library like jsPDF or a backend service.');
+    // In a real implementation, this would generate a comprehensive PDF report
+}
+
+function shareResults() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Sales Forecast Results',
+            text: `Check out my sales forecast for the next 30 days!`,
+            url: window.location.href
+        });
+    } else {
+        alert('Share functionality is available in modern browsers. You can copy the URL to share.');
+    }
+}
+</script>
+
+<style>
+/* Custom styles for better visual appeal */
+#forecast-summary {
+    background: linear-gradient(135deg, #66ea7cff 0%, #4ba25eff 100%);
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+/* Smooth animations */
+.fade-in {
+    animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailMinds</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-bg {
+            background-image: url('https://platforce.com/wp-content/uploads/2023/12/anne-nygard-x07ELaNFt34-unsplash-scaled.jpg');
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    {% include 'components/nav.html' %}
+    
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    {% include 'components/footer.html' %}
+    
+    <!-- Scripts -->
+    <script>
+        // Loading states
+        function showLoading(button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        }
+        
+        function hideLoading(button, originalText) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

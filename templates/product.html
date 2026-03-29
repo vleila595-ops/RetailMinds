@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+    <!-- Header -->
+    <div class="text-center mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Product Search</h1>
+        <p class="text-sm sm:text-base lg:text-lg text-gray-600 px-2">Search and analyze individual product performance and insights</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input
+                    type="text"
+                    id="product-search"
+                    placeholder="Search for products..."
+                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+            </div>
+            <div id="search-results" class="mt-4 space-y-2 max-h-96 overflow-y-auto">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Products Section -->
+    <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg p-4 sm:p-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Popular Products</h2>
+        <div id="popular-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <!-- Popular products will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Search functionality
+let searchTimeout;
+const searchInput = document.getElementById('product-search');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    const query = this.value.trim();
+
+    if (query.length < 2) {
+        searchResults.innerHTML = '';
+        return;
+    }
+
+    searchTimeout = setTimeout(() => {
+        searchProducts(query);
+    }, 300);
+});
+
+async function searchProducts(query) {
+    try {
+        const response = await fetch(`/api/product/search?q=${encodeURIComponent(query)}`);
+        const result = await response.json();
+
+        if (result.success) {
+            renderSearchResults(result.products);
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+function renderSearchResults(products) {
+    if (products.length === 0) {
+        searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">No products found</p>';
+        return;
+    }
+
+    searchResults.innerHTML = products.map(product => `
+        <a href="/product/${encodeURIComponent(product.Product_Name)}"
+           class="block bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg p-4 transition-colors">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-semibold text-gray-800">${product.Product_Name}</h3>
+                    <p class="text-sm text-gray-600">${product.Category}</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </div>
+        </a>
+    `).join('');
+}
+
+// Load popular products on page load
+document.addEventListener('DOMContentLoaded', loadPopularProducts);
+
+async function loadPopularProducts() {
+    try {
+        // Get top products by sales volume
+        const response = await fetch('/api/analytics/price-analysis');
+        const result = await response.json();
+
+        if (result.success) {
+            const popularProducts = result.data.slice(0, 6); // Top 6 products
+            renderPopularProducts(popularProducts);
+        }
+    } catch (error) {
+        console.error('Error loading popular products:', error);
+    }
+}
+
+function renderPopularProducts(products) {
+    const container = document.getElementById('popular-products');
+    container.innerHTML = products.map(product => `
+        <a href="/product/${encodeURIComponent(product.Product_Name)}"
+           class="bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-blue-300 rounded-xl p-6 transition-all duration-300 hover:shadow-md block">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fas fa-box text-xl"></i>
+                </div>
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${product.Category}</span>
+            </div>
+            <h3 class="font-semibold text-gray-800 text-lg mb-2 line-clamp-2">${product.Product_Name}</h3>
+            <div class="space-y-1 text-sm text-gray-600">
+                <div class="flex justify-between">
+                    <span>Avg Price:</span>
+                    <span class="font-bold text-green-600">₱${product.Avg_Price.toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Total Qty:</span>
+                    <span class="font-bold">${product.Total_Quantity.toLocaleString()}</span>
+                </div>
+            </div>
+        </a>
+    `).join('');
+}
+</script>
+{% endblock %}

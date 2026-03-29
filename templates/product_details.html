@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2" id="product-title">Loading...</h1>
+                <p class="text-xl text-gray-600" id="product-category">Loading category...</p>
+            </div>
+            <a href="/product" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Search
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-12">
+        <i class="fas fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
+        <p class="text-gray-600">Loading product insights...</p>
+    </div>
+
+    <!-- Product Insights Content -->
+    <div id="product-content" class="hidden">
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="key-metrics">
+            <!-- Metrics will be populated -->
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Price History Chart -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Price History</h3>
+                <div id="price-chart" class="h-64">
+                    <canvas id="priceHistoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sales Volume Chart -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Sales Volume Trend</h3>
+                <div id="sales-chart" class="h-64">
+                    <canvas id="salesVolumeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Insights -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-6">Detailed Insights</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div id="pricing-insights">
+                    <h4 class="font-semibold text-gray-800 mb-4">Pricing Analysis</h4>
+                    <!-- Pricing insights will be populated -->
+                </div>
+                <div id="performance-insights">
+                    <h4 class="font-semibold text-gray-800 mb-4">Performance Metrics</h4>
+                    <!-- Performance insights will be populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Section -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6 mb-8" id="prediction-section">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Price Prediction</h3>
+            <div id="prediction-content">
+                <!-- Prediction content will be populated -->
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-transactions" class="bg-white divide-y divide-gray-200">
+                        <!-- Recent transactions will be populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let productData = null;
+let priceChart = null;
+let salesChart = null;
+
+// Load product data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const productName = decodeURIComponent(window.location.pathname.split('/product/')[1]);
+    loadProductDetails(productName);
+});
+
+async function loadProductDetails(productName) {
+    try {
+        const response = await fetch(`/api/product/${encodeURIComponent(productName)}`);
+        const result = await response.json();
+
+        if (result.success) {
+            productData = result;
+            renderProductDetails(result);
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('product-content').classList.remove('hidden');
+        } else {
+            showError(result.error);
+        }
+    } catch (error) {
+        console.error('Error loading product details:', error);
+        showError('Failed to load product details');
+    }
+}
+
+function renderProductDetails(data) {
+    const insights = data.insights;
+
+    // Update header
+    document.getElementById('product-title').textContent = data.product_name;
+    document.getElementById('product-category').textContent = insights.category;
+
+    // Render key metrics
+    renderKeyMetrics(insights);
+
+    // Render charts
+    renderPriceChart(data.price_history);
+    renderSalesChart(data.price_history);
+
+    // Render detailed insights
+    renderPricingInsights(insights);
+    renderPerformanceInsights(insights);
+
+    // Render prediction
+    renderPrediction(data.prediction);
+
+    // Render recent transactions
+    renderRecentTransactions(data.price_history);
+}
+
+function renderKeyMetrics(insights) {
+    const metrics = [
+        {
+            title: 'Total Sales',
+            value: `₱${insights.total_sales.toLocaleString()}`,
+            icon: 'fas fa-dollar-sign',
+            color: 'bg-green-500'
+        },
+        {
+            title: 'Average Price',
+            value: `₱${insights.avg_price.toLocaleString()}`,
+            icon: 'fas fa-tags',
+            color: 'bg-blue-500'
+        },
+        {
+            title: 'Total Quantity',
+            value: insights.total_quantity.toLocaleString(),
+            icon: 'fas fa-boxes',
+            color: 'bg-purple-500'
+        },
+        {
+            title: 'Days Active',
+            value: insights.days_active,
+            icon: 'fas fa-calendar',
+            color: 'bg-orange-500'
+        }
+    ];
+
+    const container = document.getElementById('key-metrics');
+    container.innerHTML = metrics.map(metric => `
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div class="flex items-center">
+                <div class="w-12 h-12 rounded-lg ${metric.color} flex items-center justify-center text-white shadow-md mr-4">
+                    <i class="${metric.icon} text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-800">${metric.value}</p>
+                    <p class="text-gray-600 text-sm">${metric.title}</p>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderPriceChart(priceHistory) {
+    const ctx = document.getElementById('priceHistoryChart').getContext('2d');
+
+    const dates = priceHistory.map(item => new Date(item.Date).toLocaleDateString());
+    const prices = priceHistory.map(item => item.Unit_Price_PHP);
+
+    if (priceChart) {
+        priceChart.destroy();
+    }
+
+    priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Unit Price (PHP)',
+                data: prices,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '₱' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderSalesChart(priceHistory) {
+    const ctx = document.getElementById('salesVolumeChart').getContext('2d');
+
+    const dates = priceHistory.map(item => new Date(item.Date).toLocaleDateString());
+    const quantities = priceHistory.map(item => item.Quantity_Sold);
+
+    if (salesChart) {
+        salesChart.destroy();
+    }
+
+    salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Quantity Sold',
+                data: quantities,
+                backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                borderColor: 'rgb(16, 185, 129)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function renderPricingInsights(insights) {
+    const container = document.getElementById('pricing-insights');
+    container.innerHTML = `
+        <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                <span class="text-gray-700">Price Variability:</span>
+                <span class="font-bold text-blue-600">${(insights.price_variability * 100).toFixed(1)}%</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                <span class="text-gray-700">Price Position:</span>
+                <span class="font-bold text-green-600">${insights.price_position}</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                <span class="text-gray-700">Product Segment:</span>
+                <span class="font-bold text-purple-600">${insights.product_segment}</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderPerformanceInsights(insights) {
+    const container = document.getElementById('performance-insights');
+    container.innerHTML = `
+        <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                <span class="text-gray-700">Avg Daily Sales:</span>
+                <span class="font-bold text-orange-600">₱${insights.avg_daily_sales.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                <span class="text-gray-700">Avg Daily Quantity:</span>
+                <span class="font-bold text-red-600">${insights.avg_daily_quantity.toFixed(1)}</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-indigo-50 rounded-lg">
+                <span class="text-gray-700">Stock Turnover Rate:</span>
+                <span class="font-bold text-indigo-600">${insights.stock_turnover.toFixed(2)}</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderPrediction(prediction) {
+    const container = document.getElementById('prediction-content');
+
+    if (!prediction) {
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <i class="fas fa-chart-line text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-600">Prediction data not available</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="bg-white rounded-lg p-6 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">
+                        ₱${prediction.next_day_price.toLocaleString()}
+                    </div>
+                    <p class="text-gray-600">Predicted Next Day Price</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">
+                        ${(prediction.confidence * 100).toFixed(1)}%
+                    </div>
+                    <p class="text-gray-600">Prediction Confidence</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderRecentTransactions(priceHistory) {
+    const container = document.getElementById('recent-transactions');
+    const recentData = priceHistory.slice(-10).reverse(); // Last 10 transactions
+
+    container.innerHTML = recentData.map(item => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                ${new Date(item.Date).toLocaleDateString()}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                ₱${item.Unit_Price_PHP.toLocaleString()}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                ${item.Quantity_Sold}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                ₱${item.Sales_Value_PHP.toLocaleString()}
+            </td>
+        </tr>
+    `).join('');
+}
+
+function showError(message) {
+    document.getElementById('loading-state').innerHTML = `
+        <div class="text-center py-12">
+            <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-4"></i>
+            <p class="text-red-600 mb-4">${message}</p>
+            <a href="/product" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                Back to Search
+            </a>
+        </div>
+    `;
+}
+</script>
+{% endblock %}
