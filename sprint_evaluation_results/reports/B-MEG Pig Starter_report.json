@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:12:20.357406",
+  "product_info": {
+    "name": "B-MEG Pig Starter",
+    "train_size": 142,
+    "test_size": 36,
+    "date_range": "2022-01-07 00:00:00 to 2025-09-26 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 33482.55666666667,
+        "MSE": 1379430619.1602278,
+        "RMSE": 37140.686842871226,
+        "MAPE": 100.0,
+        "R2": 1.0,
+        "MASE": 1.784763243564986
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            72
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 33482.55666666667,
+        "std": 16073.239195124403,
+        "skewness": 0.4406080456093794,
+        "kurtosis": -0.43751297360305896
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 22549.05927418092,
+        "MSE": 696267122.76733,
+        "RMSE": 26386.874062065974,
+        "MAPE": 114.98865690160889,
+        "R2": -1.6950639392966034,
+        "MASE": 1.2019611456251678
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            18,
+            0
+          ],
+          [
+            0,
+            18
+          ]
+        ],
+        "threshold": 20633.79601673201
+      },
+      "residual_analysis": {
+        "mean": -14887.89750014934,
+        "std": 21785.720800386138,
+        "skewness": 0.3183162167758323,
+        "kurtosis": -0.8868816710847649
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 33482.55666666667,
+        "MSE": 1379430619.1602278,
+        "RMSE": 37140.686842871226,
+        "MAPE": 100.0,
+        "R2": -4.339407243134523,
+        "MASE": 1.784763243564986
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            18,
+            0
+          ],
+          [
+            0,
+            18
+          ]
+        ],
+        "threshold": 34225.104999999996
+      },
+      "residual_analysis": {
+        "mean": 33482.55666666667,
+        "std": 16073.239195124403,
+        "skewness": 0.4406080456093794,
+        "kurtosis": -0.43751297360305896
+      }
+    }
+  }
+}

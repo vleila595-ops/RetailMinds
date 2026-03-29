@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:12:29.640202",
+  "product_info": {
+    "name": "Amigo Planters Prilled Urea",
+    "train_size": 125,
+    "test_size": 32,
+    "date_range": "2022-01-07 00:00:00 to 2025-09-26 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 28234.19625,
+        "MSE": 987866395.0915064,
+        "RMSE": 31430.341949961447,
+        "MAPE": 100.0,
+        "R2": 1.0,
+        "MASE": 1.7877075687250372
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            64
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 28234.19625,
+        "std": 13809.292422423105,
+        "skewness": 0.781355896274746,
+        "kurtosis": 0.5942794790203605
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 13763.65506048865,
+        "MSE": 327661704.4882736,
+        "RMSE": 18101.428244430703,
+        "MAPE": 48.01581215576577,
+        "R2": -0.7182360777016752,
+        "MASE": 0.8714747927331638
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            16,
+            0
+          ],
+          [
+            0,
+            16
+          ]
+        ],
+        "threshold": 10960.671815781847
+      },
+      "residual_analysis": {
+        "mean": 10761.459484281957,
+        "std": 14555.160399543232,
+        "skewness": 0.7028992237136734,
+        "kurtosis": 0.982722802655084
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 28234.19625,
+        "MSE": 987866395.0915064,
+        "RMSE": 31430.341949961447,
+        "MAPE": 100.0,
+        "R2": -4.180305347694575,
+        "MASE": 1.7877075687250372
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            16,
+            0
+          ],
+          [
+            0,
+            16
+          ]
+        ],
+        "threshold": 25979.04
+      },
+      "residual_analysis": {
+        "mean": 28234.19625,
+        "std": 13809.292422423105,
+        "skewness": 0.781355896274746,
+        "kurtosis": 0.5942794790203605
+      }
+    }
+  }
+}

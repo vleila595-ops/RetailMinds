@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:13:01.419866",
+  "product_info": {
+    "name": "Golden Harvest Rice",
+    "train_size": 107,
+    "test_size": 27,
+    "date_range": "2022-01-03 00:00:00 to 2025-09-08 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 20177.537037037036,
+        "MSE": 510898075.20956296,
+        "RMSE": 22603.05455485083,
+        "MAPE": 100.0,
+        "R2": 1.0,
+        "MASE": 1.6943488743940072
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            54
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 20177.537037037036,
+        "std": 10186.514336541308,
+        "skewness": 0.4395387597627092,
+        "kurtosis": -0.1645982314821235
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 9812.93828697763,
+        "MSE": 138037783.99751207,
+        "RMSE": 11748.948208138125,
+        "MAPE": 108.88293665905016,
+        "R2": -0.33029138070512465,
+        "MASE": 0.8240124109557784
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            13,
+            0
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "threshold": 10095.681927357899
+      },
+      "residual_analysis": {
+        "mean": -5874.906848577633,
+        "std": 10174.637758566527,
+        "skewness": 0.5470586115446798,
+        "kurtosis": 0.1563112933066204
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 20177.537037037036,
+        "MSE": 510898075.20956296,
+        "RMSE": 22603.05455485083,
+        "MAPE": 100.0,
+        "R2": -3.923603423555174,
+        "MASE": 1.6943488743940072
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            13,
+            0
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "threshold": 20160.5
+      },
+      "residual_analysis": {
+        "mean": 20177.537037037036,
+        "std": 10186.514336541308,
+        "skewness": 0.4395387597627092,
+        "kurtosis": -0.1645982314821235
+      }
+    }
+  }
+}

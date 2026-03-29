@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:12:51.830574",
+  "product_info": {
+    "name": "Dona Maria Rice",
+    "train_size": 109,
+    "test_size": 28,
+    "date_range": "2022-01-03 00:00:00 to 2025-09-22 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 22071.775,
+        "MSE": 615058356.3931,
+        "RMSE": 24800.370085809205,
+        "MAPE": 100.0,
+        "R2": 1.0,
+        "MASE": 1.4861708958711577
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            56
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 22071.775,
+        "std": 11309.071789606563,
+        "skewness": 0.22861544734169392,
+        "kurtosis": -0.4411755276793361
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 13788.341873640407,
+        "MSE": 256275364.2067302,
+        "RMSE": 16008.60281869502,
+        "MAPE": 93.69852081173332,
+        "R2": -1.0037933799167456,
+        "MASE": 0.9284179634363778
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            14,
+            0
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "threshold": 13193.710912943143
+      },
+      "residual_analysis": {
+        "mean": 9767.382551443023,
+        "std": 12683.595795376663,
+        "skewness": -0.8668392525232151,
+        "kurtosis": 0.7276893469973462
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 22071.775,
+        "MSE": 615058356.3931,
+        "RMSE": 24800.370085809205,
+        "MAPE": 100.0,
+        "R2": -3.8090844261127863,
+        "MASE": 1.4861708958711577
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            14,
+            0
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "threshold": 22841.295
+      },
+      "residual_analysis": {
+        "mean": 22071.775,
+        "std": 11309.071789606563,
+        "skewness": 0.22861544734169392,
+        "kurtosis": -0.4411755276793361
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:12:25.311163",
+  "product_info": {
+    "name": "B-MEG Broiler Starter",
+    "train_size": 118,
+    "test_size": 30,
+    "date_range": "2022-01-07 00:00:00 to 2025-09-26 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 25031.004149839235,
+        "MSE": 927381396.5458274,
+        "RMSE": 30452.937404227978,
+        "MAPE": 97.47963321814723,
+        "R2": 1.0,
+        "MASE": 1.2454471703994574
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            60
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 25031.004149839235,
+        "std": 17344.458129228442,
+        "skewness": 0.8349489900123042,
+        "kurtosis": 0.4977352930535215
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 22375.450808104677,
+        "MSE": 650344884.1862677,
+        "RMSE": 25501.860406375607,
+        "MAPE": 6.656144073597851e+20,
+        "R2": -1.002759403374851,
+        "MASE": 1.1133169779585212
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            15,
+            0
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "threshold": 22797.374027114187
+      },
+      "residual_analysis": {
+        "mean": -17243.19877495012,
+        "std": 18788.746104884867,
+        "skewness": 1.07357339795773,
+        "kurtosis": 1.2786146572035517
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 25225.658333333333,
+        "MSE": 961058257.6139965,
+        "RMSE": 31000.93962469519,
+        "MAPE": 96.66666666666667,
+        "R2": -1.9596119065898603,
+        "MASE": 1.2551324191648647
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            15,
+            0
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "threshold": 22503.045000000002
+      },
+      "residual_analysis": {
+        "mean": 25225.658333333333,
+        "std": 18020.111521961433,
+        "skewness": 0.990253378132557,
+        "kurtosis": 0.8714945087784636
+      }
+    }
+  }
+}

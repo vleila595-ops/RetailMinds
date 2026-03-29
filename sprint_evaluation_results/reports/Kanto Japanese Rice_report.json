@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:12:38.670868",
+  "product_info": {
+    "name": "Kanto Japanese Rice",
+    "train_size": 115,
+    "test_size": 29,
+    "date_range": "2022-01-03 00:00:00 to 2025-09-01 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 20580.206687217033,
+        "MSE": 566027215.2180727,
+        "RMSE": 23791.326470335207,
+        "MAPE": 96.7105374570793,
+        "R2": 1.0,
+        "MASE": 1.245394432514903
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            58
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 20580.206687217033,
+        "std": 11936.595324023503,
+        "skewness": 1.3921066764714198,
+        "kurtosis": 1.7392992635513163
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 10348.656815038823,
+        "MSE": 197215716.3927121,
+        "RMSE": 14043.351323409668,
+        "MAPE": 53.551772317738845,
+        "R2": -0.36071621912466556,
+        "MASE": 0.6262405318534517
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            14,
+            0
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "threshold": 8925.046770675082
+      },
+      "residual_analysis": {
+        "mean": 6001.598446681409,
+        "std": 12696.319643010858,
+        "skewness": 0.9227752160245473,
+        "kurtosis": 0.5279995153724539
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 21600.383103448272,
+        "MSE": 611511778.8996241,
+        "RMSE": 24728.764200817317,
+        "MAPE": 100.0,
+        "R2": -3.219207327663285,
+        "MASE": 1.3071295767856623
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            14,
+            0
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "threshold": 18765.96
+      },
+      "residual_analysis": {
+        "mean": 21600.383103448272,
+        "std": 12038.904795864546,
+        "skewness": 1.1518515462394554,
+        "kurtosis": 1.096556402793912
+      }
+    }
+  }
+}

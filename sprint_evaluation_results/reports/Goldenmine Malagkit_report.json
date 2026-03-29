@@ -1,0 +1,97 @@
+{
+  "evaluation_date": "2025-10-23T16:12:56.538620",
+  "product_info": {
+    "name": "Goldenmine Malagkit",
+    "train_size": 114,
+    "test_size": 29,
+    "date_range": "2022-01-03 00:00:00 to 2025-09-22 00:00:00"
+  },
+  "best_model": "Prophet",
+  "model_performance": {
+    "ARIMA": {
+      "regression_metrics": {
+        "MAE": 18477.936551724135,
+        "MSE": 454853329.04724824,
+        "RMSE": 21327.290710431276,
+        "MAPE": 96.55172413793103,
+        "R2": 1.0,
+        "MASE": 1.1524526304854026
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            58
+          ]
+        ],
+        "threshold": NaN
+      },
+      "residual_analysis": {
+        "mean": 18477.936551724135,
+        "std": 10649.844592185622,
+        "skewness": 0.4338527023682681,
+        "kurtosis": -0.31442167005556376
+      }
+    },
+    "Prophet": {
+      "regression_metrics": {
+        "MAE": 9499.225675254296,
+        "MSE": 134058189.37631746,
+        "RMSE": 11578.350028234483,
+        "MAPE": 2.051798368248153e+20,
+        "R2": -0.1819709660080011,
+        "MASE": 0.5924583400520341
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            14,
+            0
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "threshold": 7799.452487242572
+      },
+      "residual_analysis": {
+        "mean": -1937.4061187473903,
+        "std": 11415.10608392921,
+        "skewness": 0.5264862733175673,
+        "kurtosis": 0.419159632047994
+      }
+    },
+    "XGBoost": {
+      "regression_metrics": {
+        "MAE": 18477.936551724135,
+        "MSE": 454853329.04724824,
+        "RMSE": 21327.290710431276,
+        "MAPE": 96.55172413793103,
+        "R2": -3.010373638694743,
+        "MASE": 1.1524526304854026
+      },
+      "classification_metrics": {
+        "accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            14,
+            0
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "threshold": 17997.22
+      },
+      "residual_analysis": {
+        "mean": 18477.936551724135,
+        "std": 10649.844592185622,
+        "skewness": 0.4338527023682681,
+        "kurtosis": -0.31442167005556376
+      }
+    }
+  }
+}
