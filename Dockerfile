@@ -20,4 +20,4 @@ RUN apt-get update && apt-get install -y \
 RUN pip install -r requirements.txt
 
 # run your app
-CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:10000"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
